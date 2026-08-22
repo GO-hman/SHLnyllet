@@ -3,44 +3,49 @@ package shl_nyllet.api.shlintegration;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import shl_nyllet.api.shlintegration.dto.ShlPlayerDto;
-import shl_nyllet.api.shlintegration.dto.ShlPositionGroupDto;
+import shl_nyllet.api.shlintegration.dto.ShlPlayer;
+import shl_nyllet.api.shlintegration.dto.ShlPositionGroup;
+import shl_nyllet.api.shlintegration.dto.ShlSiteSettings;
+import shl_nyllet.api.shlintegration.dto.ShlTeam;
 
 import java.util.List;
 
 @Component
 public class ShlDataClient {
 
-    private final RestClient restClient;
+	private final RestClient restClient;
 
-    public ShlDataClient(RestClient restClient) {
-        this.restClient = restClient;
-    }
+	public ShlDataClient(RestClient restClient) {
+		this.restClient = restClient;
+	}
 
-    public void fetchItems() {
-        List<ShlPositionGroupDto> positionGroups = restClient.get()
-                .uri("/athletes/by-team-uuid/4519-4519Rdei6")
-                .retrieve()
-                .body(new ParameterizedTypeReference<>() {
-                });
+	public List<ShlPlayer> fetchPlayersByTeam(String id) {
+		List<ShlPositionGroup> positionGroups = restClient.get()
+				.uri("/sports-v2/athletes/by-team-uuid/{id}", id)
+				.retrieve()
+				.body(new ParameterizedTypeReference<>() {
+				});
 
-        List<ShlPlayerDto> goalkeepers = positionGroups.stream()
-                .filter(group -> "GK".equals(group.positionCode()))
-                .flatMap(group -> group.players().stream())
-                .toList();
+		List<ShlPlayer> allPlayers = positionGroups.stream()
+				.flatMap(group -> group.getPlayers().stream())
+				.toList();
 
-        List<ShlPlayerDto> defenders = positionGroups.stream()
-                .filter(group -> "D".equals(group.positionCode()))
-                .flatMap(group -> group.players().stream())
-                .toList();
+		return allPlayers;
+	}
 
-        List<ShlPlayerDto> forwards = positionGroups.stream()
-                .filter(group -> "F".equals(group.positionCode()))
-                .flatMap(group -> group.players().stream())
-                .toList();
+	public List<ShlTeam> fetchTeams() {
+		ShlSiteSettings siteSettings = restClient.get()
+				.uri("/site/settings")
+				.retrieve()
+				.body(ShlSiteSettings.class);
+		return siteSettings.getTeamsInSite();
+	}
 
-        System.out.println(goalkeepers);
-        System.out.println(defenders);
-        System.out.println(forwards);
-    }
+	public ShlPlayer fetchPlayerById(String id) {
+		ShlPlayer player = restClient.get()
+				.uri("/statistics-v2/athlete/profile-page?playerUuid={id}", id)
+				.retrieve()
+				.body(ShlPlayer.class);
+		return player;
+	}
 }

@@ -4,9 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.List;
 
+import lombok.Data;
+
+@Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record ShlPositionGroupDto(
-    String position,
-    String positionCode,
-    List<ShlPlayerDto> players
-) {}
+public class ShlPositionGroup {
+        String position;
+        String positionCode;
+        List<ShlPlayer> players;
+}
