@@ -10,7 +10,7 @@ public class ShlClientConfig {
     @Bean
     RestClient externalSHLClient() {
         return RestClient.builder()
-                .baseUrl("https://www.shl.se/api/sports-v2").build();
+                .baseUrl("https://www.shl.se/api").build();
     }
 
 }
