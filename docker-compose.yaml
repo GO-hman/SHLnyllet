@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:16
+    container_name: shl_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: pguser
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: shl
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer:latest
+    container_name: shl_adminer
+    restart: always
+    ports:
+      - "8083:8080"
+    depends_on:
+      - db
+
+  api:
+    image: maven:3.9-eclipse-temurin-25
+    working_dir: /app
+    volumes:
+      - ./api:/app
+      - ~/.m2:/root/.m2
+    command: mvn spring-boot:run
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
