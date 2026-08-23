@@ -33,5 +33,17 @@ services:
     depends_on:
       - db
 
+  client:
+    image: node:22
+    working_dir: /app
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    command: sh -c "npm ci && npm start -- --host 0.0.0.0 --poll 1000"
+    ports:
+      - "4200:4200"
+    depends_on:
+      - api
+
 volumes:
   postgres_data:
