@@ -1,120 +1,30 @@
-<style>
-  :host {
-    display: block;
-    height: 100dvh;
-  }
-
-  h1 {
-    font-size: 3.125rem;
-    color: var(--gray-900);
-    font-weight: 500;
-    line-height: 100%;
-    letter-spacing: -0.125rem;
-    margin: 0;
-    font-family:
-      'Inter Tight',
-      -apple-system,
-      BlinkMacSystemFont,
-      'Segoe UI',
-      Roboto,
-      Helvetica,
-      Arial,
-      sans-serif,
-      'Apple Color Emoji',
-      'Segoe UI Emoji',
-      'Segoe UI Symbol';
-  }
-
-  p {
-    margin: 0;
-    color: var(--gray-700);
-  }
-
-  main {
-    width: 100%;
-    min-height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 1rem;
-    box-sizing: inherit;
-    position: relative;
-    /* background-color: #76869e; */
-  }
-
-  .content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    max-width: 700px;
-    margin-bottom: 3rem;
-  }
-
-  .player-picture {
-    width: 480px;
-    height: 640px;
-    object-fit: cover;
-    border: 5px solid var(--mat-sys-secondary);
-    border-radius: 20px;
-  }
-
-  .spacer {
-    margin-left: auto;
-  }
-
-  .flex {
-    display: flex;
-  }
-
-  .col {
-    flex-direction: column;
-  }
-
-  .mb1 {
-    margin-bottom: 1em;
-  }
-
-  .form {
-    min-width: 300px;
-  }
-
-  @media screen and (max-width: 650px) {
-    .content {
-      width: max-content;
-    }
-
-    .divider {
-      height: 1px;
-      width: 100%;
-      background: var(--red-to-pink-to-purple-horizontal-gradient);
-      margin-block: 1.5rem;
-    }
-
-    .player-picture {
-      width: auto;
-      height: 50vh;
-      object-fit: cover;
-    }
-  }
-</style>
-
 <mat-toolbar>
   <span>SHL Nyllet</span>
   <span class="spacer"></span>
+  <button matButton="outlined" (click)="onNewPlayer()">Ny spelare</button>
   <!-- Add this for switching themes later -->
   <!-- <p><mat-slide-toggle></mat-slide-toggle></p> -->
 </mat-toolbar>
 <main class="main">
-  <h1 class="mb1">Gissa nyllet!</h1>
+  <h1 class="mb1 title">Gissa nyllet!</h1>
   <div class="content">
-    @if (loading()) {
-      <h2>Loading...</h2>
-    }
-    @if (currPlayer() != null) {
-      <img class="player-picture" [src]="currPlayer()?.imgUrl" alt="Bild på spelare" />
-    }
+    <div class="player-frame">
+      @if (currPlayer() != null) {
+        <img
+          class="player-picture"
+          [class.loaded]="imageLoaded()"
+          [src]="currPlayer()?.imgUrl"
+          alt="Bild på spelare"
+          (load)="onImageLoad()"
+        />
+      }
+      @if (loading() || (currPlayer() != null && !imageLoaded())) {
+        <mat-spinner></mat-spinner>
+      }
+    </div>
+    <div>
+      <p>Antal rätt: {{ correctCounter() }}</p>
+    </div>
   </div>
 
   <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form flex col">

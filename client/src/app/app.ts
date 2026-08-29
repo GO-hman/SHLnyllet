@@ -16,6 +16,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-root',
@@ -27,6 +28,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     MatFormFieldModule,
     MatInputModule,
     MatToolbarModule,
+    MatProgressSpinner,
     MatSlideToggle,
   ],
   templateUrl: './app.html',
@@ -38,11 +40,14 @@ export class App {
   //DI
   shlService = inject(ShlControllerService);
   private fb = inject(FormBuilder);
+  private _snackBar = inject(MatSnackBar);
 
   currPlayer = signal<GuessPlayerViewOutput | null>(null);
   error = signal<string | null>(null);
   loading = signal<boolean>(false);
   guessCorrect = signal<boolean | null>(null);
+  correctCounter = signal<number>(0);
+  imageLoaded = signal<boolean>(false);
 
   form = this.fb.group({
     name: ['', Validators.required],
@@ -51,9 +56,9 @@ export class App {
   async fetchPlayer() {
     this.loading.set(true);
     this.error.set(null);
+    this.imageLoaded.set(false);
     try {
       var randomPlayer = await firstValueFrom(this.shlService.randomPlayer());
-      console.log(randomPlayer);
       this.currPlayer.set(randomPlayer);
     } catch (err) {
       this.currPlayer.set(null);
@@ -62,10 +67,16 @@ export class App {
     this.loading.set(false);
   }
 
-  private _snackBar = inject(MatSnackBar);
+  async onNewPlayer() {
+    await this.fetchPlayer();
+  }
 
   openSnackBar(message: string, action: string) {
-    this._snackBar.open(message, action);
+    this._snackBar.open(message, action, { duration: 2000 });
+  }
+
+  onImageLoad() {
+    this.imageLoaded.set(true);
   }
 
   async ngOnInit() {
@@ -97,6 +108,8 @@ export class App {
         this.guessCorrect.set(true);
         this.fetchPlayer();
         this.openSnackBar('Rätt', 'x');
+        this.correctCounter.update((c) => c + 1);
+        this.form.reset();
       } else {
         this.guessCorrect.set(false);
         this.openSnackBar('Fel', 'x');
