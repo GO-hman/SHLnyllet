@@ -12,7 +12,7 @@ import { inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { BASE_PATH_DEFAULT, CLIENT_CONTEXT_TOKEN_DEFAULT } from "../tokens";
 import { HttpParamsBuilder } from "../utils/http-params-builder";
-import { RequestOptions, ShlTeam, GuessPlayerViewInput, ShlPlayer, GuessPlayerViewOutput } from "../models";
+import { RequestOptions, ShlTeam, GuessPlayerViewInput, ShlPlayer, GuessPlayerViewOutput, PlayerNameViewOutput } from "../models";
 
 @Injectable({ providedIn: "root" })
 export class ShlControllerService {
@@ -215,6 +215,32 @@ export class ShlControllerService {
     randomPlayer(observe?: 'events', options?: RequestOptions<'json'>): Observable<HttpEvent<GuessPlayerViewOutput>>;
     randomPlayer(observe?: 'body' | 'events' | 'response', options?: RequestOptions<'arraybuffer' | 'blob' | 'json' | 'text'>): Observable<any> {
         const url = `${this.basePath}/shl/player/random`;
+
+        let headers: HttpHeaders;
+        if (options?.headers instanceof HttpHeaders) {
+            headers = options.headers;
+        } else {
+            headers = new HttpHeaders(options?.headers);
+        }
+        // Advertise the response content type declared in the spec
+        if (!headers.has('Accept')) {
+            headers = headers.set('Accept', 'application/json');
+        }
+
+        return this.httpClient.request('get', url, {
+            observe,
+            headers,
+            reportProgress: options?.reportProgress,
+            withCredentials: options?.withCredentials,
+            context: this.createContextWithClientId(options?.context)
+        });
+    }
+
+    playerNames(observe?: 'body', options?: RequestOptions<'json'>): Observable<Array<PlayerNameViewOutput>>;
+    playerNames(observe?: 'response', options?: RequestOptions<'json'>): Observable<HttpResponse<Array<PlayerNameViewOutput>>>;
+    playerNames(observe?: 'events', options?: RequestOptions<'json'>): Observable<HttpEvent<Array<PlayerNameViewOutput>>>;
+    playerNames(observe?: 'body' | 'events' | 'response', options?: RequestOptions<'arraybuffer' | 'blob' | 'json' | 'text'>): Observable<any> {
+        const url = `${this.basePath}/shl/player/playernames`;
 
         let headers: HttpHeaders;
         if (options?.headers instanceof HttpHeaders) {
