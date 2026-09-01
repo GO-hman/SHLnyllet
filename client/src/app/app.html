@@ -6,6 +6,15 @@
   <!-- <p><mat-slide-toggle></mat-slide-toggle></p> -->
 </mat-toolbar>
 <main class="main">
+  <mat-form-field>
+    <mat-label>Välj ett lag</mat-label>
+    <mat-select [(value)]="selectedTeam" (selectionChange)="onTeamChange($event.value)">
+      <mat-option>None</mat-option>
+      @for (team of allTeams(); track team.uuid) {
+        <mat-option [value]="team">{{ team.teamCode }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
   <h1 class="mb1 title">Gissa nyllet!</h1>
   <div class="content">
     <div class="player-frame">
