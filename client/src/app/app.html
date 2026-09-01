@@ -9,7 +9,7 @@
   <mat-form-field>
     <mat-label>Välj ett lag</mat-label>
     <mat-select [(value)]="selectedTeam" (selectionChange)="onTeamChange($event.value)">
-      <mat-option>None</mat-option>
+      <mat-option [value]="null">Alla lag</mat-option>
       @for (team of allTeams(); track team.uuid) {
         <mat-option [value]="team">{{ team.teamCode }}</mat-option>
       }

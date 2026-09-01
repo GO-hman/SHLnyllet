@@ -2,10 +2,8 @@ import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
-  GuessPlayerViewInput,
   GuessPlayerViewOutput,
   ShlControllerService,
-  ShlPlayer,
   ShlTeam,
 } from '../api';
 import { firstValueFrom } from 'rxjs';
@@ -32,7 +30,7 @@ import { MatSelectModule } from '@angular/material/select';
     MatToolbarModule,
     MatProgressSpinner,
     MatSelectModule,
-    MatSlideToggle,
+    // MatSlideToggle,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
@@ -96,6 +94,7 @@ export class App {
 
   onTeamChange(team: ShlTeam | undefined) {
     if (!team?.uuid) {
+      this.fetchRandomPlayer();
       return;
     }
     this.fetchRandomPlayerForTeam(team.uuid);
