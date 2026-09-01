@@ -30,4 +30,9 @@ public class GuessPlayerService {
 	public ShlPlayer getRandomPlayer() {
 		return playerRepo.findRandomPlayer();
 	}
+
+	public ShlPlayer getRandomPlayerByTeam(String id) {
+		var player = playerRepo.findRandomPlayerByTeamUuid(id);
+		return player;
+	}
 }

@@ -28,8 +28,12 @@ public class ShlApiClient {
 				.body(new ParameterizedTypeReference<>() {
 				});
 
+		ShlTeam team = new ShlTeam();
+		team.setUuid(teamId);
+
 		return positionGroups.stream()
 				.flatMap(group -> group.getPlayers().stream())
+				.peek(player -> player.setTeam(team))
 				.toList();
 	}
 
