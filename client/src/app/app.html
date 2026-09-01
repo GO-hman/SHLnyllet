@@ -39,7 +39,12 @@
   <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form flex col">
     <mat-form-field>
       <mat-label>Namn</mat-label>
-      <input matInput fullWidth placeholder="Ange namn" formControlName="name" />
+      <input matInput fullWidth placeholder="Ange namn" formControlName="name"  [matAutocomplete]="auto" />
+  <mat-autocomplete #auto="matAutocomplete">
+    @for (player of filteredPlayers(); track player.name) {
+      <mat-option [value]="player.name">{{ player.name }}</mat-option>
+    }
+  </mat-autocomplete>
     </mat-form-field>
     <button matButton="outlined" type="submit">Gissa!</button>
   </form>

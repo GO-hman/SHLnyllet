@@ -38,6 +38,10 @@ export interface GuessPlayerViewOutput {
     imgUrl?: string;
 }
 
+export interface PlayerNameViewOutput {
+    name?: string;
+}
+
 /** Request Options for Angular HttpClient requests */
 export interface RequestOptions<TResponseType extends 'arraybuffer' | 'blob' | 'json' | 'text'> {
     headers?: HttpHeaders;

@@ -16,6 +16,7 @@ import shl_nyllet.api.services.GuessPlayerService;
 import shl_nyllet.api.services.ShlSyncService;
 import shl_nyllet.api.viewModels.GuessPlayerViewInput;
 import shl_nyllet.api.viewModels.GuessPlayerViewOutput;
+import shl_nyllet.api.viewModels.PlayerNameViewOutput;
 
 @RestController()
 public class ShlController {
@@ -73,6 +74,11 @@ public class ShlController {
     @GetMapping("/shl/player/{id}/random")
     public GuessPlayerViewOutput randomPlayerFromTeam(@PathVariable String id) {
         return new GuessPlayerViewOutput(playerGuessService.getRandomPlayerByTeam(id));
+    }
+
+    @GetMapping("/shl/player/playernames")
+    public List<PlayerNameViewOutput> playerNames() {
+        return playerGuessService.getPlayerNames();
     }
 
 }
