@@ -26,6 +26,7 @@ export interface ShlPlayer {
     nationality?: string;
     jerseyNumber?: number;
     renderedLatestPortrait?: ShlRenderedMedia;
+    team?: ShlTeam;
 }
 
 export interface ShlRenderedMedia {

@@ -2,6 +2,7 @@ package shl_nyllet.api.services;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
@@ -39,6 +40,16 @@ public class ShlSyncService {
 
 	public List<ShlPlayer> syncPlayersForTeam(String teamId) {
 		List<ShlPlayer> players = apiClient.fetchPlayersByTeam(teamId);
+		Set<String> fetchedIds = players.stream().map(ShlPlayer::getUuid).collect(Collectors.toSet());
+
+		List<String> staleIds = playerRepo.findAllByTeamUuid(teamId).stream()
+				.map(ShlPlayer::getUuid)
+				.filter(id -> !fetchedIds.contains(id))
+				.toList();
+		if (!staleIds.isEmpty()) {
+			playerRepo.deleteAllById(staleIds);
+		}
+
 		playerRepo.saveAll(players);
 		return players;
 	}

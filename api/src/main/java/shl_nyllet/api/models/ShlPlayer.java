@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
 @Data
@@ -22,4 +24,7 @@ public class ShlPlayer {
     @JsonAlias("media")
     @Embedded
     ShlRenderedMedia renderedLatestPortrait;
+    @ManyToOne
+    @JoinColumn(name = "team_uuid")
+    ShlTeam team;
 }

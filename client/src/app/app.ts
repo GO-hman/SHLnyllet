@@ -2,10 +2,9 @@ import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
-  GuessPlayerViewInput,
   GuessPlayerViewOutput,
   ShlControllerService,
-  ShlPlayer,
+  ShlTeam,
 } from '../api';
 import { firstValueFrom } from 'rxjs';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -17,6 +16,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-root',
@@ -29,7 +29,8 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
     MatInputModule,
     MatToolbarModule,
     MatProgressSpinner,
-    MatSlideToggle,
+    MatSelectModule,
+    // MatSlideToggle,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
@@ -48,21 +49,28 @@ export class App {
   guessCorrect = signal<boolean | null>(null);
   correctCounter = signal<number>(0);
   imageLoaded = signal<boolean>(false);
+  allTeams = signal<ShlTeam[] | null>(null);
+  selectedTeam = signal<ShlTeam | null>(null);
 
   form = this.fb.group({
     name: ['', Validators.required],
   });
 
   async fetchPlayer() {
+    const team = this.selectedTeam();
+    team === null
+      ? await this.fetchRandomPlayer()
+      : await this.fetchRandomPlayerForTeam(team.uuid!);
+  }
+
+  async fetchTeams() {
     this.loading.set(true);
-    this.error.set(null);
-    this.imageLoaded.set(false);
     try {
-      var randomPlayer = await firstValueFrom(this.shlService.randomPlayer());
-      this.currPlayer.set(randomPlayer);
-    } catch (err) {
-      this.currPlayer.set(null);
-      this.error.set(err instanceof HttpErrorResponse ? err.message : 'Failed to fetch player');
+      var teams = await firstValueFrom(this.shlService.allTeams());
+      this.allTeams.set(teams);
+    } catch (error) {
+      this.allTeams.set(null);
+      this.error.set(error instanceof HttpErrorResponse ? error.message : 'Failed To fetch teams');
     }
     this.loading.set(false);
   }
@@ -81,6 +89,43 @@ export class App {
 
   async ngOnInit() {
     await this.fetchPlayer();
+    await this.fetchTeams();
+  }
+
+  onTeamChange(team: ShlTeam | undefined) {
+    if (!team?.uuid) {
+      this.fetchRandomPlayer();
+      return;
+    }
+    this.fetchRandomPlayerForTeam(team.uuid);
+  }
+
+  async fetchRandomPlayerForTeam(teamId: string) {
+    this.loading.set(true);
+    this.error.set(null);
+    this.imageLoaded.set(false);
+    try {
+      const player = await firstValueFrom(this.shlService.randomPlayerFromTeam(teamId));
+      this.currPlayer.set(player);
+    } catch (err) {
+      this.currPlayer.set(null);
+      this.error.set(err instanceof HttpErrorResponse ? err.message : 'Failed to fetch player');
+    }
+    this.loading.set(false);
+  }
+
+  async fetchRandomPlayer() {
+    this.loading.set(true);
+    this.error.set(null);
+    this.imageLoaded.set(false);
+    try {
+      var randomPlayer = await firstValueFrom(this.shlService.randomPlayer());
+      this.currPlayer.set(randomPlayer);
+    } catch (err) {
+      this.currPlayer.set(null);
+      this.error.set(err instanceof HttpErrorResponse ? err.message : 'Failed to fetch player');
+    }
+    this.loading.set(false);
   }
 
   async onSubmit() {

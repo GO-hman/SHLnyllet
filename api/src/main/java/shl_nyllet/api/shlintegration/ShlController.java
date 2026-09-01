@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import shl_nyllet.api.data.ShlTeamRepository;
 import shl_nyllet.api.models.ShlPlayer;
 import shl_nyllet.api.models.ShlTeam;
 import shl_nyllet.api.services.GuessPlayerService;
@@ -22,12 +23,14 @@ public class ShlController {
     private final ShlApiClient shlApiClient;
     private final ShlSyncService shlSyncService;
     private final GuessPlayerService playerGuessService;
+    private final ShlTeamRepository teamRepo;
 
     public ShlController(ShlApiClient shlApiClient, ShlSyncService shlSyncService,
-            GuessPlayerService playerGuessService) {
+            GuessPlayerService playerGuessService, ShlTeamRepository teamRepo) {
         this.shlApiClient = shlApiClient;
         this.shlSyncService = shlSyncService;
         this.playerGuessService = playerGuessService;
+        this.teamRepo = teamRepo;
     }
 
     @GetMapping("/shl/teams/{id}/players")
@@ -37,7 +40,7 @@ public class ShlController {
 
     @GetMapping("/shl/teams")
     public List<ShlTeam> allTeams() {
-        return shlApiClient.fetchTeams();
+        return teamRepo.findAll();
     }
 
     @GetMapping("/shl/player/{id}")
@@ -66,4 +69,10 @@ public class ShlController {
     public GuessPlayerViewOutput randomPlayer() {
         return new GuessPlayerViewOutput(playerGuessService.getRandomPlayer());
     }
+
+    @GetMapping("/shl/player/{id}/random")
+    public GuessPlayerViewOutput randomPlayerFromTeam(@PathVariable String id) {
+        return new GuessPlayerViewOutput(playerGuessService.getRandomPlayerByTeam(id));
+    }
+
 }

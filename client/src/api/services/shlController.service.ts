@@ -184,6 +184,32 @@ export class ShlControllerService {
         });
     }
 
+    randomPlayerFromTeam(id: string, observe?: 'body', options?: RequestOptions<'json'>): Observable<GuessPlayerViewOutput>;
+    randomPlayerFromTeam(id: string, observe?: 'response', options?: RequestOptions<'json'>): Observable<HttpResponse<GuessPlayerViewOutput>>;
+    randomPlayerFromTeam(id: string, observe?: 'events', options?: RequestOptions<'json'>): Observable<HttpEvent<GuessPlayerViewOutput>>;
+    randomPlayerFromTeam(id: string, observe?: 'body' | 'events' | 'response', options?: RequestOptions<'arraybuffer' | 'blob' | 'json' | 'text'>): Observable<any> {
+        const url = `${this.basePath}/shl/player/${id}/random`;
+
+        let headers: HttpHeaders;
+        if (options?.headers instanceof HttpHeaders) {
+            headers = options.headers;
+        } else {
+            headers = new HttpHeaders(options?.headers);
+        }
+        // Advertise the response content type declared in the spec
+        if (!headers.has('Accept')) {
+            headers = headers.set('Accept', 'application/json');
+        }
+
+        return this.httpClient.request('get', url, {
+            observe,
+            headers,
+            reportProgress: options?.reportProgress,
+            withCredentials: options?.withCredentials,
+            context: this.createContextWithClientId(options?.context)
+        });
+    }
+
     randomPlayer(observe?: 'body', options?: RequestOptions<'json'>): Observable<GuessPlayerViewOutput>;
     randomPlayer(observe?: 'response', options?: RequestOptions<'json'>): Observable<HttpResponse<GuessPlayerViewOutput>>;
     randomPlayer(observe?: 'events', options?: RequestOptions<'json'>): Observable<HttpEvent<GuessPlayerViewOutput>>;
