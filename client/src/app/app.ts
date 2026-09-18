@@ -1,7 +1,7 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { GuessPlayerViewOutput, PlayerNameViewOutput, ShlControllerService, ShlTeam } from '../api';
+import { PlayerNameViewOutput, ShlControllerService } from '../api';
 import { firstValueFrom } from 'rxjs';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -9,11 +9,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Snackbar } from './snackbar/snackbar';
+import { PlayerCard } from './player-card/player-card';
 
 @Component({
   selector: 'app-root',
@@ -25,10 +25,9 @@ import { Snackbar } from './snackbar/snackbar';
     MatFormFieldModule,
     MatInputModule,
     MatToolbarModule,
-    MatProgressSpinner,
     MatSelectModule,
     MatAutocompleteModule,
-    // MatSlideToggle,
+    PlayerCard,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
@@ -36,19 +35,16 @@ import { Snackbar } from './snackbar/snackbar';
 export class App {
   protected readonly title = signal('client');
 
+  playerCard = viewChild.required(PlayerCard);
+
   //DI
   shlService = inject(ShlControllerService);
   private fb = inject(FormBuilder);
   private _snackBar = inject(Snackbar);
 
-  currPlayer = signal<GuessPlayerViewOutput | null>(null);
   error = signal<string | null>(null);
-  loading = signal<boolean>(false);
   guessCorrect = signal<boolean | null>(null);
   correctCounter = signal<number>(0);
-  imageLoaded = signal<boolean>(false);
-  allTeams = signal<ShlTeam[] | null>(null);
-  selectedTeam = signal<ShlTeam | null>(null);
   playerNames = signal<PlayerNameViewOutput[]>([]);
 
   form = this.fb.group({
@@ -64,73 +60,12 @@ export class App {
       .slice(0, 20);
   });
 
-  async fetchPlayer() {
-    const team = this.selectedTeam();
-    team === null
-      ? await this.fetchRandomPlayer()
-      : await this.fetchRandomPlayerForTeam(team.uuid!);
-  }
-
-  async fetchTeams() {
-    this.loading.set(true);
-    try {
-      var teams = await firstValueFrom(this.shlService.allTeams());
-      this.allTeams.set(teams);
-    } catch (error) {
-      this.allTeams.set(null);
-      this.error.set(error instanceof HttpErrorResponse ? error.message : 'Failed To fetch teams');
-    }
-    this.loading.set(false);
-  }
-
   async onNewPlayer() {
-    await this.fetchPlayer();
-  }
-
-  onImageLoad() {
-    this.imageLoaded.set(true);
+    await this.playerCard().fetchPlayer();
   }
 
   async ngOnInit() {
-    await this.fetchPlayer();
-    await this.fetchTeams();
     this.playerNames.set((await firstValueFrom(this.shlService.playerNames())) ?? []);
-  }
-
-  onTeamChange(team: ShlTeam | undefined) {
-    if (!team?.uuid) {
-      this.fetchRandomPlayer();
-      return;
-    }
-    this.fetchRandomPlayerForTeam(team.uuid);
-  }
-
-  async fetchRandomPlayerForTeam(teamId: string) {
-    this.loading.set(true);
-    this.error.set(null);
-    this.imageLoaded.set(false);
-    try {
-      const player = await firstValueFrom(this.shlService.randomPlayerFromTeam(teamId));
-      this.currPlayer.set(player);
-    } catch (err) {
-      this.currPlayer.set(null);
-      this.error.set(err instanceof HttpErrorResponse ? err.message : 'Failed to fetch player');
-    }
-    this.loading.set(false);
-  }
-
-  async fetchRandomPlayer() {
-    this.loading.set(true);
-    this.error.set(null);
-    this.imageLoaded.set(false);
-    try {
-      var randomPlayer = await firstValueFrom(this.shlService.randomPlayer());
-      this.currPlayer.set(randomPlayer);
-    } catch (err) {
-      this.currPlayer.set(null);
-      this.error.set(err instanceof HttpErrorResponse ? err.message : 'Failed to fetch player');
-    }
-    this.loading.set(false);
   }
 
   async onSubmit() {
@@ -139,7 +74,7 @@ export class App {
       alert('Invalid form');
       return;
     }
-    const player = this.currPlayer();
+    const player = this.playerCard().currPlayer();
     if (!player?.uuid) {
       return;
     }
@@ -156,7 +91,7 @@ export class App {
 
       if (response.status === 200) {
         this.guessCorrect.set(true);
-        this.fetchPlayer();
+        this.playerCard().fetchPlayer();
         this._snackBar.openSnackBar('Rätt', 'x');
         this.correctCounter.update((c) => c + 1);
         this.form.reset();

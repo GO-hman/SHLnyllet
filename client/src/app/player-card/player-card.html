@@ -1,0 +1,27 @@
+<main class="main">
+  <mat-form-field>
+    <mat-label>Välj ett lag</mat-label>
+    <mat-select [(value)]="selectedTeam" (selectionChange)="onTeamChange($event.value)">
+      <mat-option [value]="null">Alla lag</mat-option>
+      @for (team of allTeams(); track team.uuid) {
+        <mat-option [value]="team">{{ team.teamCode }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  <div class="content">
+    <div class="player-frame">
+      @if (currPlayer() != null) {
+        <img
+          class="player-picture"
+          [class.loaded]="imageLoaded()"
+          [src]="currPlayer()?.imgUrl"
+          alt="Bild på spelare"
+          (load)="onImageLoad()"
+        />
+      }
+      @if (loading() || (currPlayer() != null && !imageLoaded())) {
+        <mat-spinner></mat-spinner>
+      }
+    </div>
+  </div>
+</main>
