@@ -1,12 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import {
-  GuessPlayerViewOutput,
-  PlayerNameViewOutput,
-  ShlControllerService,
-  ShlTeam,
-} from '../api';
+import { GuessPlayerViewOutput, PlayerNameViewOutput, ShlControllerService, ShlTeam } from '../api';
 import { firstValueFrom } from 'rxjs';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -14,12 +9,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatSlideToggle } from '@angular/material/slide-toggle';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { Snackbar } from './snackbar/snackbar';
 
 @Component({
   selector: 'app-root',
@@ -33,7 +27,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
     MatToolbarModule,
     MatProgressSpinner,
     MatSelectModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
     // MatSlideToggle,
   ],
   templateUrl: './app.html',
@@ -45,7 +39,7 @@ export class App {
   //DI
   shlService = inject(ShlControllerService);
   private fb = inject(FormBuilder);
-  private _snackBar = inject(MatSnackBar);
+  private _snackBar = inject(Snackbar);
 
   currPlayer = signal<GuessPlayerViewOutput | null>(null);
   error = signal<string | null>(null);
@@ -57,19 +51,18 @@ export class App {
   selectedTeam = signal<ShlTeam | null>(null);
   playerNames = signal<PlayerNameViewOutput[]>([]);
 
-  
   form = this.fb.group({
     name: ['', Validators.required],
   });
-  
-  nameValue = toSignal(this.form.controls.name.valueChanges, {initialValue: ''})
+
+  nameValue = toSignal(this.form.controls.name.valueChanges, { initialValue: '' });
   filteredPlayers = computed(() => {
     const term = (this.nameValue() ?? '').toLowerCase().trim();
-    if(!term) return [];
-     return (this.playerNames() ?? [])
-    .filter((p) => p.name?.toLowerCase().includes(term))
-    .slice(0, 20);
-  })
+    if (!term) return [];
+    return (this.playerNames() ?? [])
+      .filter((p) => p.name?.toLowerCase().includes(term))
+      .slice(0, 20);
+  });
 
   async fetchPlayer() {
     const team = this.selectedTeam();
@@ -94,10 +87,6 @@ export class App {
     await this.fetchPlayer();
   }
 
-  openSnackBar(message: string, action: string) {
-    this._snackBar.open(message, action, { duration: 2000 });
-  }
-
   onImageLoad() {
     this.imageLoaded.set(true);
   }
@@ -105,7 +94,7 @@ export class App {
   async ngOnInit() {
     await this.fetchPlayer();
     await this.fetchTeams();
-    this.playerNames.set(await firstValueFrom(this.shlService.playerNames()) ?? []);
+    this.playerNames.set((await firstValueFrom(this.shlService.playerNames())) ?? []);
   }
 
   onTeamChange(team: ShlTeam | undefined) {
@@ -168,12 +157,12 @@ export class App {
       if (response.status === 200) {
         this.guessCorrect.set(true);
         this.fetchPlayer();
-        this.openSnackBar('Rätt', 'x');
+        this._snackBar.openSnackBar('Rätt', 'x');
         this.correctCounter.update((c) => c + 1);
         this.form.reset();
       } else {
         this.guessCorrect.set(false);
-        this.openSnackBar('Fel', 'x');
+        this._snackBar.openSnackBar('Fel', 'x');
       }
     } catch (err) {
       this.error.set(err instanceof HttpErrorResponse ? err.message : 'Failed to submit guess');
