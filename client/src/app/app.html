@@ -1,39 +1,8 @@
 <mat-toolbar>
   <span>SHL Nyllet</span>
   <span class="spacer"></span>
-  <button matButton="outlined" (click)="onNewPlayer()">Ny spelare</button>
   <!-- Add this for switching themes later -->
   <!-- <p><mat-slide-toggle></mat-slide-toggle></p> -->
 </mat-toolbar>
-<main class="main">
-  <h1 class="mb1 title">Gissa nyllet!</h1>
-  <div class="content">
-    <app-player-card></app-player-card>
-    <div>
-      <p>Antal rätt: {{ correctCounter() }}</p>
-    </div>
-  </div>
 
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form flex col">
-    <mat-form-field>
-      <mat-label>Namn</mat-label>
-      <input
-        matInput
-        fullWidth
-        placeholder="Ange namn"
-        formControlName="name"
-        [matAutocomplete]="auto"
-      />
-      <mat-autocomplete #auto="matAutocomplete">
-        @for (player of filteredPlayers(); track player.name) {
-          <mat-option [value]="player.name">{{ player.name }}</mat-option>
-        }
-      </mat-autocomplete>
-    </mat-form-field>
-    <button matButton="outlined" type="submit">Gissa!</button>
-  </form>
-  @if (guessCorrect()) {
-    <div></div>
-  }
-</main>
 <router-outlet />

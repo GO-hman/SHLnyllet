@@ -80,6 +80,10 @@ export class PlayerCard {
     this.loading.set(false);
   }
 
+  async onNewPlayer() {
+    await this.fetchPlayer();
+  }
+
   //Team logic
   onTeamChange(team: ShlTeam | undefined) {
     if (!team?.uuid) {
