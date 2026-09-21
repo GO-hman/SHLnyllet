@@ -1,55 +1,15 @@
 <mat-toolbar>
   <span>SHL Nyllet</span>
   <span class="spacer"></span>
-  <button matButton="outlined" (click)="onNewPlayer()">Ny spelare</button>
   <!-- Add this for switching themes later -->
   <!-- <p><mat-slide-toggle></mat-slide-toggle></p> -->
 </mat-toolbar>
-<main class="main">
-  <mat-form-field>
-    <mat-label>Välj ett lag</mat-label>
-    <mat-select [(value)]="selectedTeam" (selectionChange)="onTeamChange($event.value)">
-      <mat-option [value]="null">Alla lag</mat-option>
-      @for (team of allTeams(); track team.uuid) {
-        <mat-option [value]="team">{{ team.teamCode }}</mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
-  <h1 class="mb1 title">Gissa nyllet!</h1>
-  <div class="content">
-    <div class="player-frame">
-      @if (currPlayer() != null) {
-        <img
-          class="player-picture"
-          [class.loaded]="imageLoaded()"
-          [src]="currPlayer()?.imgUrl"
-          alt="Bild på spelare"
-          (load)="onImageLoad()"
-        />
-      }
-      @if (loading() || (currPlayer() != null && !imageLoaded())) {
-        <mat-spinner></mat-spinner>
-      }
-    </div>
-    <div>
-      <p>Antal rätt: {{ correctCounter() }}</p>
-    </div>
-  </div>
 
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form flex col">
-    <mat-form-field>
-      <mat-label>Namn</mat-label>
-      <input matInput fullWidth placeholder="Ange namn" formControlName="name"  [matAutocomplete]="auto" />
-  <mat-autocomplete #auto="matAutocomplete">
-    @for (player of filteredPlayers(); track player.name) {
-      <mat-option [value]="player.name">{{ player.name }}</mat-option>
-    }
-  </mat-autocomplete>
-    </mat-form-field>
-    <button matButton="outlined" type="submit">Gissa!</button>
-  </form>
-  @if (guessCorrect()) {
-    <div></div>
-  }
-</main>
-<router-outlet />
+<mat-tab-group>
+  <mat-tab label="Namn">
+    <app-guess-player-name></app-guess-player-name>
+  </mat-tab>
+  <mat-tab label="Nummer"> Nummer </mat-tab>
+</mat-tab-group>
+
+<!-- <router-outlet /> -->
