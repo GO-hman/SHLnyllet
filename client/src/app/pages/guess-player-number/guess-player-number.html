@@ -1,0 +1,20 @@
+<main class="main">
+  <h1 class="mb1 title">Gissa numret!</h1>
+  <div class="content">
+    <app-player-card [game]="GameType.GUESS_NUMBER"></app-player-card>
+    <div>
+      <p>Antal rätt: {{ correctCounter() }}</p>
+    </div>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form flex col">
+    <mat-form-field>
+      <mat-label>Nummer</mat-label>
+      <input matInput fullWidth placeholder="Ange nummer" formControlName="number" />
+      @if (form.controls.number.touched && form.controls.number.hasError('pattern')) {
+        <mat-error> Ange nummer mellan 1-99 </mat-error>
+      }
+    </mat-form-field>
+    <button matButton="outlined" type="submit">Gissa!</button>
+  </form>
+</main>

@@ -19,11 +19,21 @@ public class GuessPlayerService {
         this.playerRepo = playerRepo;
     }
 
-    public Optional<ShlPlayer> guessPlayer(String id, String name) {
+    public Optional<ShlPlayer> guessName(String id, String name) {
         ShlPlayer player = playerRepo.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Player not found: " + id));
 
         if (player.getFullName().equalsIgnoreCase(name)) {
+            return Optional.of(player);
+        }
+        return Optional.empty();
+    }
+
+    public Optional<ShlPlayer> guessNumber(String id, int number) {
+        ShlPlayer player = playerRepo.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Player not found: " + id));
+
+        if (player.getJerseyNumber() == number) {
             return Optional.of(player);
         }
         return Optional.empty();

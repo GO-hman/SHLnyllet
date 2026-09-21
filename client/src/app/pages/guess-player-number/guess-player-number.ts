@@ -1,9 +1,15 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, inject, signal, viewChild } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroupDirective,
+  NgForm,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
-import { ShlControllerService, PlayerNameViewOutput } from '../../../api';
+import { ShlControllerService, GameType } from '../../../api';
 import { PlayerCard } from '../../player-card/player-card';
 import { Snackbar } from '../../snackbar/snackbar';
 import { CommonModule } from '@angular/common';
@@ -15,7 +21,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatToolbarModule } from '@angular/material/toolbar';
 
 @Component({
-  selector: 'app-guess-player-name',
+  selector: 'app-guess-player-number',
   imports: [
     ReactiveFormsModule,
     CommonModule,
@@ -27,11 +33,13 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     MatAutocompleteModule,
     PlayerCard,
   ],
-  templateUrl: './guess-player-name.html',
-  styleUrl: './guess-player-name.css',
+  templateUrl: './guess-player-number.html',
+  styleUrl: './guess-player-number.css',
 })
-export class GuessPlayerName {
+export class GuessPlayerNumber {
   playerCard = viewChild.required(PlayerCard);
+
+  readonly GameType = GameType;
 
   //DI
   shlService = inject(ShlControllerService);
@@ -41,41 +49,32 @@ export class GuessPlayerName {
   error = signal<string | null>(null);
   guessCorrect = signal<boolean | null>(null);
   correctCounter = signal<number>(0);
-  playerNames = signal<PlayerNameViewOutput[]>([]);
 
   form = this.fb.group({
-    name: ['', Validators.required],
+    number: [
+      '',
+      [Validators.required, Validators.pattern(/^\d+$/), Validators.min(1), Validators.max(99)],
+    ],
   });
-
-  nameValue = toSignal(this.form.controls.name.valueChanges, { initialValue: '' });
-  filteredPlayers = computed(() => {
-    const term = (this.nameValue() ?? '').toLowerCase().trim();
-    if (!term) return [];
-    return (this.playerNames() ?? [])
-      .filter((p) => p.name?.toLowerCase().includes(term))
-      .slice(0, 20);
-  });
-
-  async ngOnInit() {
-    this.playerNames.set((await firstValueFrom(this.shlService.playerNames())) ?? []);
-  }
 
   async onSubmit() {
     this.guessCorrect.set(null);
     if (this.form.invalid) {
-      alert('Invalid form');
       return;
     }
+
     const player = this.playerCard().currPlayer();
     if (!player?.uuid) {
       return;
     }
     try {
+      const number = Number(this.form.value.number!);
+
       const response = await firstValueFrom(
-        this.shlService.guessName(
+        this.shlService.guessNumber(
           {
             id: player.uuid,
-            name: this.form.value.name!,
+            jerseyNumber: Number(this.form.value.number!),
           },
           'response',
         ),

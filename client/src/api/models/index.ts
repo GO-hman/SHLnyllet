@@ -13,9 +13,9 @@ export interface ShlTeam {
     teamCode?: string;
 }
 
-export interface GuessPlayerViewInput {
+export interface GuessNumberViewInput {
     id?: string;
-    name?: string;
+    jerseyNumber?: number;
 }
 
 export interface ShlPlayer {
@@ -33,9 +33,21 @@ export interface ShlRenderedMedia {
     url?: string;
 }
 
+export interface GuessNameViewInput {
+    id?: string;
+    name?: string;
+}
+
+export enum GameType {
+    GUESS_NAME = "GUESS_NAME",
+    GUESS_NUMBER = "GUESS_NUMBER"
+}
+
 export interface GuessPlayerViewOutput {
     uuid?: string;
     imgUrl?: string;
+    name?: string;
+    jerserNumber?: number;
 }
 
 export interface PlayerNameViewOutput {
