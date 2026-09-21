@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, Input, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { GuessPlayerViewOutput, ShlControllerService, ShlTeam } from '../../api';
+import { GameType, GuessPlayerViewOutput, ShlControllerService, ShlTeam } from '../../api';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -32,6 +32,9 @@ import { RouterOutlet } from '@angular/router';
 export class PlayerCard {
   shlService = inject(ShlControllerService);
 
+  // @Input() game:  = 'GUESS_NAME';
+  @Input() game: GameType = GameType.GUESS_NAME;
+
   loading = signal<boolean>(false);
   error = signal<string | null>(null);
   imageLoaded = signal<boolean>(false);
@@ -57,7 +60,7 @@ export class PlayerCard {
     this.error.set(null);
     this.imageLoaded.set(false);
     try {
-      var randomPlayer = await firstValueFrom(this.shlService.randomPlayer());
+      var randomPlayer = await firstValueFrom(this.shlService.randomPlayer(this.game));
       this.currPlayer.set(randomPlayer);
     } catch (err) {
       this.currPlayer.set(null);

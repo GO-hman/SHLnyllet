@@ -1,6 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, inject, signal, viewChild } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import {
   FormBuilder,
   FormControl,
@@ -10,7 +9,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
-import { ShlControllerService, PlayerNameViewOutput } from '../../../api';
+import { ShlControllerService, GameType } from '../../../api';
 import { PlayerCard } from '../../player-card/player-card';
 import { Snackbar } from '../../snackbar/snackbar';
 import { CommonModule } from '@angular/common';
@@ -39,6 +38,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 })
 export class GuessPlayerNumber {
   playerCard = viewChild.required(PlayerCard);
+
+  readonly GameType = GameType;
 
   //DI
   shlService = inject(ShlControllerService);

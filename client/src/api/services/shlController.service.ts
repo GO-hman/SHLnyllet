@@ -12,7 +12,7 @@ import { inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { BASE_PATH_DEFAULT, CLIENT_CONTEXT_TOKEN_DEFAULT } from "../tokens";
 import { HttpParamsBuilder } from "../utils/http-params-builder";
-import { RequestOptions, ShlTeam, GuessNumberViewInput, ShlPlayer, GuessNameViewInput, GuessPlayerViewOutput, PlayerNameViewOutput } from "../models";
+import { RequestOptions, ShlTeam, GuessNumberViewInput, ShlPlayer, GuessNameViewInput, GameType, GuessPlayerViewOutput, PlayerNameViewOutput } from "../models";
 
 @Injectable({ providedIn: "root" })
 export class ShlControllerService {
@@ -189,6 +189,38 @@ export class ShlControllerService {
         });
     }
 
+    randomPlayerFromTeam(teamId: string, game?: GameType, observe?: 'body', options?: RequestOptions<'json'>): Observable<GuessPlayerViewOutput>;
+    randomPlayerFromTeam(teamId: string, game?: GameType, observe?: 'response', options?: RequestOptions<'json'>): Observable<HttpResponse<GuessPlayerViewOutput>>;
+    randomPlayerFromTeam(teamId: string, game?: GameType, observe?: 'events', options?: RequestOptions<'json'>): Observable<HttpEvent<GuessPlayerViewOutput>>;
+    randomPlayerFromTeam(teamId: string, game?: GameType, observe?: 'body' | 'events' | 'response', options?: RequestOptions<'arraybuffer' | 'blob' | 'json' | 'text'>): Observable<any> {
+        const url = `${this.basePath}/shl/player/${teamId}/random`;
+
+        let params = new HttpParams();
+        if (game != null) {
+            params = HttpParamsBuilder.addToHttpParams(params, game, 'game');
+        }
+
+        let headers: HttpHeaders;
+        if (options?.headers instanceof HttpHeaders) {
+            headers = options.headers;
+        } else {
+            headers = new HttpHeaders(options?.headers);
+        }
+        // Advertise the response content type declared in the spec
+        if (!headers.has('Accept')) {
+            headers = headers.set('Accept', 'application/json');
+        }
+
+        return this.httpClient.request('get', url, {
+            observe,
+            headers,
+            params,
+            reportProgress: options?.reportProgress,
+            withCredentials: options?.withCredentials,
+            context: this.createContextWithClientId(options?.context)
+        });
+    }
+
     getPlayer(id: string, observe?: 'body', options?: RequestOptions<'json'>): Observable<ShlPlayer>;
     getPlayer(id: string, observe?: 'response', options?: RequestOptions<'json'>): Observable<HttpResponse<ShlPlayer>>;
     getPlayer(id: string, observe?: 'events', options?: RequestOptions<'json'>): Observable<HttpEvent<ShlPlayer>>;
@@ -215,38 +247,17 @@ export class ShlControllerService {
         });
     }
 
-    randomPlayerFromTeam(id: string, observe?: 'body', options?: RequestOptions<'json'>): Observable<GuessPlayerViewOutput>;
-    randomPlayerFromTeam(id: string, observe?: 'response', options?: RequestOptions<'json'>): Observable<HttpResponse<GuessPlayerViewOutput>>;
-    randomPlayerFromTeam(id: string, observe?: 'events', options?: RequestOptions<'json'>): Observable<HttpEvent<GuessPlayerViewOutput>>;
-    randomPlayerFromTeam(id: string, observe?: 'body' | 'events' | 'response', options?: RequestOptions<'arraybuffer' | 'blob' | 'json' | 'text'>): Observable<any> {
-        const url = `${this.basePath}/shl/player/${id}/random`;
-
-        let headers: HttpHeaders;
-        if (options?.headers instanceof HttpHeaders) {
-            headers = options.headers;
-        } else {
-            headers = new HttpHeaders(options?.headers);
-        }
-        // Advertise the response content type declared in the spec
-        if (!headers.has('Accept')) {
-            headers = headers.set('Accept', 'application/json');
-        }
-
-        return this.httpClient.request('get', url, {
-            observe,
-            headers,
-            reportProgress: options?.reportProgress,
-            withCredentials: options?.withCredentials,
-            context: this.createContextWithClientId(options?.context)
-        });
-    }
-
-    randomPlayer(observe?: 'body', options?: RequestOptions<'json'>): Observable<GuessPlayerViewOutput>;
-    randomPlayer(observe?: 'response', options?: RequestOptions<'json'>): Observable<HttpResponse<GuessPlayerViewOutput>>;
-    randomPlayer(observe?: 'events', options?: RequestOptions<'json'>): Observable<HttpEvent<GuessPlayerViewOutput>>;
-    randomPlayer(observe?: 'body' | 'events' | 'response', options?: RequestOptions<'arraybuffer' | 'blob' | 'json' | 'text'>): Observable<any> {
+    randomPlayer(game?: GameType, observe?: 'body', options?: RequestOptions<'json'>): Observable<GuessPlayerViewOutput>;
+    randomPlayer(game?: GameType, observe?: 'response', options?: RequestOptions<'json'>): Observable<HttpResponse<GuessPlayerViewOutput>>;
+    randomPlayer(game?: GameType, observe?: 'events', options?: RequestOptions<'json'>): Observable<HttpEvent<GuessPlayerViewOutput>>;
+    randomPlayer(game?: GameType, observe?: 'body' | 'events' | 'response', options?: RequestOptions<'arraybuffer' | 'blob' | 'json' | 'text'>): Observable<any> {
         const url = `${this.basePath}/shl/player/random`;
 
+        let params = new HttpParams();
+        if (game != null) {
+            params = HttpParamsBuilder.addToHttpParams(params, game, 'game');
+        }
+
         let headers: HttpHeaders;
         if (options?.headers instanceof HttpHeaders) {
             headers = options.headers;
@@ -261,6 +272,7 @@ export class ShlControllerService {
         return this.httpClient.request('get', url, {
             observe,
             headers,
+            params,
             reportProgress: options?.reportProgress,
             withCredentials: options?.withCredentials,
             context: this.createContextWithClientId(options?.context)

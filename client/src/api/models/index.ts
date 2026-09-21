@@ -38,9 +38,16 @@ export interface GuessNameViewInput {
     name?: string;
 }
 
+export enum GameType {
+    GUESS_NAME = "GUESS_NAME",
+    GUESS_NUMBER = "GUESS_NUMBER"
+}
+
 export interface GuessPlayerViewOutput {
     uuid?: string;
     imgUrl?: string;
+    name?: string;
+    jerserNumber?: number;
 }
 
 export interface PlayerNameViewOutput {

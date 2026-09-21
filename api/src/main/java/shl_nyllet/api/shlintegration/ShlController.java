@@ -7,8 +7,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import shl_nyllet.api.data.GameType;
 import shl_nyllet.api.data.ShlTeamRepository;
 import shl_nyllet.api.models.ShlPlayer;
 import shl_nyllet.api.models.ShlTeam;
@@ -19,6 +22,7 @@ import shl_nyllet.api.viewModels.GuessNumberViewInput;
 import shl_nyllet.api.viewModels.GuessPlayerViewOutput;
 import shl_nyllet.api.viewModels.PlayerNameViewOutput;
 
+@RequestMapping("/shl")
 @RestController()
 public class ShlController {
 
@@ -35,54 +39,56 @@ public class ShlController {
         this.teamRepo = teamRepo;
     }
 
-    @GetMapping("/shl/teams/{id}/players")
+    @GetMapping("/teams/{id}/players")
     public List<ShlPlayer> fetchByTeam(@PathVariable String id) {
         return shlApiClient.fetchPlayersByTeam(id);
     }
 
-    @GetMapping("/shl/teams")
+    @GetMapping("/teams")
     public List<ShlTeam> allTeams() {
         return teamRepo.findAll();
     }
 
-    @GetMapping("/shl/player/{id}")
+    @GetMapping("/player/{id}")
     public ShlPlayer getPlayer(@PathVariable String id) {
         return shlApiClient.fetchPlayerById(id);
     }
 
-    @PostMapping("/shl/teams/sync")
+    @PostMapping("/teams/sync")
     public List<ShlTeam> syncTeams() {
         return shlSyncService.syncTeams();
     }
 
-    @PostMapping("/shl/players/sync")
+    @PostMapping("/players/sync")
     public void syncPlayers() {
         shlSyncService.syncAllPlayers();
     }
 
-    @PostMapping("/shl/player/guessName")
+    @GetMapping("/player/random")
+    public GuessPlayerViewOutput randomPlayer(@RequestParam(defaultValue = "GUESS_NAME") GameType game) {
+        return new GuessPlayerViewOutput(playerGuessService.getRandomPlayer(), game);
+    }
+
+    @GetMapping("/player/{teamId}/random")
+    public GuessPlayerViewOutput randomPlayerFromTeam(
+            @PathVariable String teamId,
+            @RequestParam(defaultValue = "GUESS_NAME") GameType game) {
+        return new GuessPlayerViewOutput(playerGuessService.getRandomPlayerByTeam(teamId), game);
+    }
+
+    @GetMapping("/player/playernames")
+    public List<PlayerNameViewOutput> playerNames() {
+        return playerGuessService.getPlayerNames();
+    }
+
+    @PostMapping("/player/guessName")
     public ResponseEntity<ShlPlayer> guessName(@RequestBody GuessNameViewInput guess) {
         return playerGuessService.guessName(guess.getId(), guess.getName())
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.noContent().build());
     }
 
-    @GetMapping("/shl/player/random")
-    public GuessPlayerViewOutput randomPlayer() {
-        return new GuessPlayerViewOutput(playerGuessService.getRandomPlayer());
-    }
-
-    @GetMapping("/shl/player/{id}/random")
-    public GuessPlayerViewOutput randomPlayerFromTeam(@PathVariable String id) {
-        return new GuessPlayerViewOutput(playerGuessService.getRandomPlayerByTeam(id));
-    }
-
-    @GetMapping("/shl/player/playernames")
-    public List<PlayerNameViewOutput> playerNames() {
-        return playerGuessService.getPlayerNames();
-    }
-
-    @PostMapping("/shl/player/guessNumber")
+    @PostMapping("/player/guessNumber")
     public ResponseEntity<ShlPlayer> guessNumber(@RequestBody GuessNumberViewInput guess) {
         return playerGuessService.guessNumber(guess.getId(), guess.getJerseyNumber())
                 .map(ResponseEntity::ok)
