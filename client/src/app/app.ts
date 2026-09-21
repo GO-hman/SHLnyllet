@@ -8,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { GuessPlayerName } from './pages/guess-player-name/guess-player-name';
 import { MatTabGroup, MatTabsModule } from '@angular/material/tabs';
+import { GuessPlayerNumber } from './pages/guess-player-number/guess-player-number';
 
 @Component({
   selector: 'app-root',
@@ -21,6 +22,7 @@ import { MatTabGroup, MatTabsModule } from '@angular/material/tabs';
     MatToolbarModule,
     GuessPlayerName,
     MatTabsModule,
+    GuessPlayerNumber,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',

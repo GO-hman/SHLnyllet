@@ -1,16 +1,17 @@
 <main class="main">
-  <mat-form-field>
-    <mat-label>Välj ett lag</mat-label>
-    <mat-select [(value)]="selectedTeam" (selectionChange)="onTeamChange($event.value)">
-      <mat-option [value]="null">Alla lag</mat-option>
-      @for (team of allTeams(); track team.uuid) {
-        <mat-option [value]="team">{{ team.teamCode }}</mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
+  <div style="display: flex; gap: 1rem; align-items: center">
+    <mat-form-field>
+      <mat-label>Välj ett lag</mat-label>
+      <mat-select [(value)]="selectedTeam" (selectionChange)="onTeamChange($event.value)">
+        <mat-option [value]="null">Alla lag</mat-option>
+        @for (team of allTeams(); track team.uuid) {
+          <mat-option [value]="team">{{ team.teamCode }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <button matButton="outlined" (click)="onNewPlayer()">Ny spelare</button>
+  </div>
   <div class="content">
-    <!-- <button matButton="outlined" (click)="onNewPlayer()">Ny spelare</button> -->
-
     <div class="player-frame">
       @if (currPlayer() != null) {
         <img
