@@ -6,7 +6,6 @@ import { firstValueFrom } from 'rxjs';
 import { ShlControllerService, PlayerNameViewOutput } from '../../../api';
 import { PlayerCard } from '../../player-card/player-card';
 import { Snackbar } from '../../snackbar/snackbar';
-import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
@@ -73,7 +72,7 @@ export class GuessPlayerName {
     }
     try {
       const response = await firstValueFrom(
-        this.shlService.guessPlayer(
+        this.shlService.guessName(
           {
             id: player.uuid,
             name: this.form.value.name!,

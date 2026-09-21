@@ -14,7 +14,8 @@ import shl_nyllet.api.models.ShlPlayer;
 import shl_nyllet.api.models.ShlTeam;
 import shl_nyllet.api.services.GuessPlayerService;
 import shl_nyllet.api.services.ShlSyncService;
-import shl_nyllet.api.viewModels.GuessPlayerViewInput;
+import shl_nyllet.api.viewModels.GuessNameViewInput;
+import shl_nyllet.api.viewModels.GuessNumberViewInput;
 import shl_nyllet.api.viewModels.GuessPlayerViewOutput;
 import shl_nyllet.api.viewModels.PlayerNameViewOutput;
 
@@ -59,9 +60,9 @@ public class ShlController {
         shlSyncService.syncAllPlayers();
     }
 
-    @PostMapping("/shl/player/guess")
-    public ResponseEntity<ShlPlayer> guessPlayer(@RequestBody GuessPlayerViewInput guess) {
-        return playerGuessService.guessPlayer(guess.getId(), guess.getName())
+    @PostMapping("/shl/player/guessName")
+    public ResponseEntity<ShlPlayer> guessName(@RequestBody GuessNameViewInput guess) {
+        return playerGuessService.guessName(guess.getId(), guess.getName())
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.noContent().build());
     }
@@ -79,6 +80,13 @@ public class ShlController {
     @GetMapping("/shl/player/playernames")
     public List<PlayerNameViewOutput> playerNames() {
         return playerGuessService.getPlayerNames();
+    }
+
+    @PostMapping("/shl/player/guessNumber")
+    public ResponseEntity<ShlPlayer> guessNumber(@RequestBody GuessNumberViewInput guess) {
+        return playerGuessService.guessNumber(guess.getId(), guess.getJerseyNumber())
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
     }
 
 }

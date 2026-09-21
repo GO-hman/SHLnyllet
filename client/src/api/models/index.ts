@@ -13,9 +13,9 @@ export interface ShlTeam {
     teamCode?: string;
 }
 
-export interface GuessPlayerViewInput {
+export interface GuessNumberViewInput {
     id?: string;
-    name?: string;
+    jerseyNumber?: number;
 }
 
 export interface ShlPlayer {
@@ -31,6 +31,11 @@ export interface ShlPlayer {
 
 export interface ShlRenderedMedia {
     url?: string;
+}
+
+export interface GuessNameViewInput {
+    id?: string;
+    name?: string;
 }
 
 export interface GuessPlayerViewOutput {

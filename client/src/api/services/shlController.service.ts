@@ -12,7 +12,7 @@ import { inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { BASE_PATH_DEFAULT, CLIENT_CONTEXT_TOKEN_DEFAULT } from "../tokens";
 import { HttpParamsBuilder } from "../utils/http-params-builder";
-import { RequestOptions, ShlTeam, GuessPlayerViewInput, ShlPlayer, GuessPlayerViewOutput, PlayerNameViewOutput } from "../models";
+import { RequestOptions, ShlTeam, GuessNumberViewInput, ShlPlayer, GuessNameViewInput, GuessPlayerViewOutput, PlayerNameViewOutput } from "../models";
 
 @Injectable({ providedIn: "root" })
 export class ShlControllerService {
@@ -75,11 +75,11 @@ export class ShlControllerService {
         });
     }
 
-    guessPlayer(guessPlayerViewInput: GuessPlayerViewInput, observe?: 'body', options?: RequestOptions<'json'>): Observable<ShlPlayer>;
-    guessPlayer(guessPlayerViewInput: GuessPlayerViewInput, observe?: 'response', options?: RequestOptions<'json'>): Observable<HttpResponse<ShlPlayer>>;
-    guessPlayer(guessPlayerViewInput: GuessPlayerViewInput, observe?: 'events', options?: RequestOptions<'json'>): Observable<HttpEvent<ShlPlayer>>;
-    guessPlayer(guessPlayerViewInput: GuessPlayerViewInput, observe?: 'body' | 'events' | 'response', options?: RequestOptions<'arraybuffer' | 'blob' | 'json' | 'text'>): Observable<any> {
-        const url = `${this.basePath}/shl/player/guess`;
+    guessNumber(guessNumberViewInput: GuessNumberViewInput, observe?: 'body', options?: RequestOptions<'json'>): Observable<ShlPlayer>;
+    guessNumber(guessNumberViewInput: GuessNumberViewInput, observe?: 'response', options?: RequestOptions<'json'>): Observable<HttpResponse<ShlPlayer>>;
+    guessNumber(guessNumberViewInput: GuessNumberViewInput, observe?: 'events', options?: RequestOptions<'json'>): Observable<HttpEvent<ShlPlayer>>;
+    guessNumber(guessNumberViewInput: GuessNumberViewInput, observe?: 'body' | 'events' | 'response', options?: RequestOptions<'arraybuffer' | 'blob' | 'json' | 'text'>): Observable<any> {
+        const url = `${this.basePath}/shl/player/guessNumber`;
 
         let headers: HttpHeaders;
         if (options?.headers instanceof HttpHeaders) {
@@ -97,7 +97,38 @@ export class ShlControllerService {
         }
 
         return this.httpClient.request('post', url, {
-            body: guessPlayerViewInput,
+            body: guessNumberViewInput,
+            observe,
+            headers,
+            reportProgress: options?.reportProgress,
+            withCredentials: options?.withCredentials,
+            context: this.createContextWithClientId(options?.context)
+        });
+    }
+
+    guessName(guessNameViewInput: GuessNameViewInput, observe?: 'body', options?: RequestOptions<'json'>): Observable<ShlPlayer>;
+    guessName(guessNameViewInput: GuessNameViewInput, observe?: 'response', options?: RequestOptions<'json'>): Observable<HttpResponse<ShlPlayer>>;
+    guessName(guessNameViewInput: GuessNameViewInput, observe?: 'events', options?: RequestOptions<'json'>): Observable<HttpEvent<ShlPlayer>>;
+    guessName(guessNameViewInput: GuessNameViewInput, observe?: 'body' | 'events' | 'response', options?: RequestOptions<'arraybuffer' | 'blob' | 'json' | 'text'>): Observable<any> {
+        const url = `${this.basePath}/shl/player/guessName`;
+
+        let headers: HttpHeaders;
+        if (options?.headers instanceof HttpHeaders) {
+            headers = options.headers;
+        } else {
+            headers = new HttpHeaders(options?.headers);
+        }
+        // Advertise the response content type declared in the spec
+        if (!headers.has('Accept')) {
+            headers = headers.set('Accept', 'application/json');
+        }
+        // Set Content-Type for JSON requests if not already set
+        if (!headers.has('Content-Type')) {
+            headers = headers.set('Content-Type', 'application/json');
+        }
+
+        return this.httpClient.request('post', url, {
+            body: guessNameViewInput,
             observe,
             headers,
             reportProgress: options?.reportProgress,
