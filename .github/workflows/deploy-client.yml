@@ -1,0 +1,53 @@
+name: Deploy Client
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "client/**"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+env:
+  STORAGE_ACCOUNT_NAME: "shlnylletclient"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install dependencies
+        working-directory: client
+        run: npm ci
+
+      - name: Build (production)
+        working-directory: client
+        run: npm run build -- --configuration production
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+
+      - name: Upload to $web
+        run: |
+          az storage blob upload-batch \
+            --account-name ${{ env.STORAGE_ACCOUNT_NAME }} \
+            --destination '$web' \
+            --source client/dist/client/browser \
+            --auth-mode login \
+            --overwrite
