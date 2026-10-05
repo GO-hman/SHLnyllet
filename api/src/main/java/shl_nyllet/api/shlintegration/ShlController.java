@@ -95,4 +95,9 @@ public class ShlController {
                 .orElse(ResponseEntity.noContent().build());
     }
 
+    @GetMapping("/health")
+    public String healthCheck() {
+        return "OK";
+    }
+
 }
