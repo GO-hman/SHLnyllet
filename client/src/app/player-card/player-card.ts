@@ -32,7 +32,6 @@ import { RouterOutlet } from '@angular/router';
 export class PlayerCard {
   shlService = inject(ShlControllerService);
 
-  // @Input() game:  = 'GUESS_NAME';
   @Input() game: GameType = GameType.GUESS_NAME;
 
   loading = signal<boolean>(false);
