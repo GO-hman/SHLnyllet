@@ -19,8 +19,12 @@
           <mat-option [value]="player.name">{{ player.name }}</mat-option>
         }
       </mat-autocomplete>
+
+      @if (form.controls.name.touched && form.controls.name.hasError('required')) {
+        <mat-error> Ange ett namn </mat-error>
+      }
     </mat-form-field>
-    <button matButton="outlined" type="submit">Gissa!</button>
+    <app-loadingbutton [isLoading]="loading()"></app-loadingbutton>
   </form>
   <div>
     <p>Antal rätt: {{ correctCounter() }}</p>

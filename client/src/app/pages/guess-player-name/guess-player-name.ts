@@ -13,6 +13,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Loadingbutton } from '../../loadingbutton/loadingbutton';
 
 @Component({
   selector: 'app-guess-player-name',
@@ -26,6 +28,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     MatSelectModule,
     MatAutocompleteModule,
     PlayerCard,
+    MatProgressSpinnerModule,
+    Loadingbutton,
   ],
   templateUrl: './guess-player-name.html',
   styleUrl: './guess-player-name.css',
@@ -38,6 +42,7 @@ export class GuessPlayerName {
   private fb = inject(FormBuilder);
   private _snackBar = inject(Snackbar);
 
+  loading = signal<boolean>(false);
   error = signal<string | null>(null);
   guessCorrect = signal<boolean | null>(null);
   correctCounter = signal<number>(0);
@@ -63,13 +68,14 @@ export class GuessPlayerName {
   async onSubmit() {
     this.guessCorrect.set(null);
     if (this.form.invalid) {
-      alert('Invalid form');
+      this.form.markAllAsTouched();
       return;
     }
     const player = this.playerCard().currPlayer();
     if (!player?.uuid) {
       return;
     }
+    this.loading.set(true);
     try {
       const response = await firstValueFrom(
         this.shlService.guessName(
@@ -94,5 +100,6 @@ export class GuessPlayerName {
     } catch (err) {
       this.error.set(err instanceof HttpErrorResponse ? err.message : 'Failed to submit guess');
     }
+    this.loading.set(false);
   }
 }

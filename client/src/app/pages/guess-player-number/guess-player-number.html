@@ -12,7 +12,7 @@
         <mat-error> Ange nummer mellan 1-99 </mat-error>
       }
     </mat-form-field>
-    <button matButton="outlined" type="submit">Gissa!</button>
+    <app-loadingbutton [isLoading]="loading()"></app-loadingbutton>
   </form>
   <div>
     <p>Antal rätt: {{ correctCounter() }}</p>
