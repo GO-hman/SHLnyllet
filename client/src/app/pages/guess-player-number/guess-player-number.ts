@@ -19,6 +19,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { Loadingbutton } from '../../loadingbutton/loadingbutton';
 
 @Component({
   selector: 'app-guess-player-number',
@@ -32,6 +33,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     MatSelectModule,
     MatAutocompleteModule,
     PlayerCard,
+    Loadingbutton,
   ],
   templateUrl: './guess-player-number.html',
   styleUrl: './guess-player-number.css',
@@ -46,6 +48,7 @@ export class GuessPlayerNumber {
   private fb = inject(FormBuilder);
   private _snackBar = inject(Snackbar);
 
+  loading = signal<boolean>(false);
   error = signal<string | null>(null);
   guessCorrect = signal<boolean | null>(null);
   correctCounter = signal<number>(0);
@@ -67,6 +70,7 @@ export class GuessPlayerNumber {
     if (!player?.uuid) {
       return;
     }
+    this.loading.set(true);
     try {
       const number = Number(this.form.value.number!);
 
@@ -93,5 +97,6 @@ export class GuessPlayerNumber {
     } catch (err) {
       this.error.set(err instanceof HttpErrorResponse ? err.message : 'Failed to submit guess');
     }
+    this.loading.set(false);
   }
 }

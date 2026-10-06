@@ -8,12 +8,9 @@ main {
   min-height: auto;
   display: flex;
   flex-direction: column;
-  /* justify-content: center;
-  align-items: center; */
   padding: 1rem;
   box-sizing: inherit;
   position: relative;
-  /* background-color: #76869e; */
 }
 
 .content {
@@ -22,7 +19,6 @@ main {
   align-items: center;
   width: 100%;
   max-width: 700px;
-  /* margin-bottom: 1.5rem; */
 }
 
 .player-frame {
@@ -73,7 +69,7 @@ main {
 
 .player-name {
   font-size: 1.5em;
-  padding-top: 0.5em;
+  padding-top: 1em;
 }
 
 @media screen and (max-width: 650px) {

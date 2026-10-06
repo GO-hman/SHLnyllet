@@ -1,0 +1,7 @@
+<button matButton="outlined" type="submit">
+  @if (!isLoading()) {
+    Gissa!
+  } @else {
+    <mat-progress-spinner mode="indeterminate" diameter="20" aria-label="Loading" />
+  }
+</button>
