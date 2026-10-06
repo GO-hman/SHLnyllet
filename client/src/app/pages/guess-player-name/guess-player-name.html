@@ -2,9 +2,6 @@
   <h1 class="mb1 title">Gissa namnet!</h1>
   <div class="content">
     <app-player-card></app-player-card>
-    <div>
-      <p>Antal rätt: {{ correctCounter() }}</p>
-    </div>
   </div>
 
   <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form flex col">
@@ -25,7 +22,7 @@
     </mat-form-field>
     <button matButton="outlined" type="submit">Gissa!</button>
   </form>
-  @if (guessCorrect()) {
-    <div></div>
-  }
+  <div>
+    <p>Antal rätt: {{ correctCounter() }}</p>
+  </div>
 </main>
