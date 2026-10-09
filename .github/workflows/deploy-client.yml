@@ -31,6 +31,10 @@ jobs:
         working-directory: client
         run: npm ci
 
+      - name: Inject production API key
+        working-directory: client
+        run: sed -i "s|__API_KEY__|${{ secrets.API_KEY }}|g" src/environments/environment.prod.ts
+
       - name: Build (production)
         working-directory: client
         run: npm run build -- --configuration production
