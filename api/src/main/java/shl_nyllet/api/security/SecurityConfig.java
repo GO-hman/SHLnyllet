@@ -23,6 +23,11 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 	@Value("${CORS_ALLOWED_ORIGIN:http://localhost:4200}")
 	private String corsAllowedOrigin;
+	private final RateLimitingFilter rateLimitingFilter;
+
+	public SecurityConfig(RateLimitingFilter rateLimitingFilter) {
+		this.rateLimitingFilter = rateLimitingFilter;
+	}
 
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
@@ -48,6 +53,7 @@ public class SecurityConfig {
 				.sessionManagement(
 						httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer
 								.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
 				.addFilterBefore(new AuthenticationFilter(authService),
 						UsernamePasswordAuthenticationFilter.class);
 		return http.build();
